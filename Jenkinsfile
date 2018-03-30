@@ -20,20 +20,11 @@ pipeline {
     stage('Security Scans') {
       parallel {
         stage('Static Analysis') {
-          steps {
-            sh './security-scan.sh -b'
-          }
-          post {
-            always {
-              // junit 'brakeman-output.json'
-              publishHTML([reportDir: 'brakeman/reports', reportFiles: 'brakeman-output.html', reportName: 'Brakeman Report', reportTitles: '', allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false])
-            }
-          }
+          steps { railsStaticAnalysis() }
+          post { always { publishRailsStaticAnalysis() } }
         }
         stage('Vulnerability Scan') {
-          steps {
-            sh './security-scan.sh -a'
-          }
+          steps { gemVulnerabilityScan() }
         }
       }
     }
